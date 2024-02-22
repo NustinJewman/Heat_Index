@@ -1,3 +1,5 @@
+// JSON files have placeholder data - it will be updated each time the script runs
+
 let wins = require('./json-data/win-streaks.json'); 
 let losses = require('./json-data/losing-streaks.json'); 
 const axios = require('axios'); 
@@ -89,7 +91,7 @@ for (obj in streaksJSON) {
     config.data = tweets[i]; // JSON.parse to bring it back into object form for the config? IF not json.parse at line 47
     // console.log(data, typeof data, 'line 70'); 
     console.log(config.data, typeof config.data, 'line 71 config'); 
-    // makeAxiosRequest(); 
+    // makeAxiosRequest(); // COMMENTED OUT to prevent over requesting to the Twitter API - uncomment to submit the tweet requests
   }
 
 // })
