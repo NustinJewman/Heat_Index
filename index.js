@@ -43,16 +43,17 @@ let data = {
 // const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; 
 // let timestamp = today.toTimeString().split(' ')[0].concat(`:${today.getMilliseconds()}`); 
 // console.log(timestamp); 
-let positiveVerbs = ['maintaining', 'upholding', 'sustaining', 'managing', 'on', 'trying to add to', 'trying to extend', 'currently on', 'pushing', 'hoping to continue']; 
+let positiveVerbs = ['maintaining', 'upholding', 'sustaining', 'managing', 'on', 'trying to add to', 'trying to extend', 'currently on', 'pushing', 'hoping to continue building on']; 
 let negativeVerbs = ['suffering', 'going through', 'on', 'trying to break', 'battling', 'currently on', 'dealing with', 'fighting', 'facing', 'hoping to end']; 
 
-let config = {
+let config = { // this needs to be reset every time -  posting the tweets comes back as unauthorized every day
+              // when i don't run it again in post man - a token issue???
   method: 'post',
   maxBodyLength: Infinity,
   url: 'https://api.twitter.com/2/tweets',
   headers: { 
     'Content-Type': 'application/json', 
-    'Authorization': 'OAuth oauth_consumer_key="FQQMEpazjknIYGr4K302vGLzK",oauth_token="1749975350782656512-NvWNPOYrLsLHXvW6A9J1uLq7W01cfE",oauth_signature_method="HMAC-SHA1",oauth_timestamp="1708482384",oauth_nonce="EkIrTHna7GO",oauth_version="1.0",oauth_signature="ZGS70hx1FqgXfPYnKKKagxDzF%2B8%3D"', 
+    'Authorization': 'OAuth oauth_consumer_key="FQQMEpazjknIYGr4K302vGLzK",oauth_token="1749975350782656512-NvWNPOYrLsLHXvW6A9J1uLq7W01cfE",oauth_signature_method="HMAC-SHA1",oauth_timestamp="1709048404",oauth_nonce="J0e2srJrGIH",oauth_version="1.0",oauth_signature="kLJHVZbHWUQRGFvyHMNSVCaDHuQ%3D"', 
     'Cookie': 'guest_id=v1%3A170647810995146516; guest_id_ads=v1%3A170647810995146516; guest_id_marketing=v1%3A170647810995146516; personalization_id="v1_lNTPkAFdrQyW8qW0etiwCg=="'
   },
   data : data
@@ -91,7 +92,7 @@ for (obj in streaksJSON) {
     config.data = tweets[i]; // JSON.parse to bring it back into object form for the config? IF not json.parse at line 47
     // console.log(data, typeof data, 'line 70'); 
     console.log(config.data, typeof config.data, 'line 71 config'); 
-    // makeAxiosRequest(); // COMMENTED OUT to prevent over requesting to the Twitter API - uncomment to submit the tweet requests
+    makeAxiosRequest(); // COMMENTED OUT to prevent over requesting to the Twitter API - uncomment to submit the tweet requests
   }
 
 // })

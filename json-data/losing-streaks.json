@@ -1,1 +1,50 @@
-{"0": {"Team": "Denver Nuggets", "W": 36, "L": 19, "PCT": 0.655, "GB": "3", "HOME": "21-5", "AWAY": "15-14", "DIV": "4-5", "CONF": "20-13", "PPG": 113.9, "OPP PPG": 110.8, "DIFF": 3.1, "STRK": "L3", "L10": "5-5"}, "1": {"Team": "Toronto Raptors", "W": 19, "L": 36, "PCT": 0.345, "GB": "24", "HOME": "11-16", "AWAY": "8-20", "DIV": "0-11", "CONF": "12-23", "PPG": 113.9, "OPP PPG": 117.8, "DIFF": -3.9, "STRK": "L3", "L10": "3-7"}, "2": {"Team": "Detroit Pistons", "W": 8, "L": 46, "PCT": 0.148, "GB": "34.5", "HOME": "4-23", "AWAY": "4-23", "DIV": "1-10", "CONF": "5-25", "PPG": 112.9, "OPP PPG": 122.0, "DIFF": -9.1, "STRK": "L3", "L10": "3-7"}, "3": {"Team": "Utah Jazz", "W": 26, "L": 30, "PCT": 0.464, "GB": "13.5", "HOME": "17-10", "AWAY": "9-20", "DIV": "5-6", "CONF": "13-22", "PPG": 118.0, "OPP PPG": 120.7, "DIFF": -2.7, "STRK": "L4", "L10": "3-7"}, "4": {"Team": "New York Knicks", "W": 33, "L": 22, "PCT": 0.6, "GB": "10", "HOME": "19-8", "AWAY": "14-14", "DIV": "6-3", "CONF": "22-12", "PPG": 114.5, "OPP PPG": 109.9, "DIFF": 4.6, "STRK": "L4", "L10": "5-5"}, "5": {"Team": "Portland Trail Blazers", "W": 15, "L": 39, "PCT": 0.278, "GB": "23.5", "HOME": "9-17", "AWAY": "6-22", "DIV": "1-11", "CONF": "6-31", "PPG": 107.9, "OPP PPG": 116.7, "DIFF": -8.8, "STRK": "L6", "L10": "2-8"}, "6": {"Team": "Washington Wizards", "W": 9, "L": 45, "PCT": 0.167, "GB": "33.5", "HOME": "3-23", "AWAY": "6-22", "DIV": "2-10", "CONF": "6-31", "PPG": 114.8, "OPP PPG": 123.9, "DIFF": -9.1, "STRK": "L8", "L10": "2-8"}}
+{
+    "0": {
+        "Team": "San Antonio Spurs",
+        "W": 11,
+        "L": 47,
+        "PCT": 0.19,
+        "GB": "29.5",
+        "HOME": "5-21",
+        "AWAY": "6-26",
+        "DIV": "1-9",
+        "CONF": "7-25",
+        "PPG": 112.1,
+        "OPP PPG": 120.7,
+        "DIFF": -8.6,
+        "STRK": "L4",
+        "L10": "1-9"
+    },
+    "1": {
+        "Team": "Detroit Pistons",
+        "W": 8,
+        "L": 49,
+        "PCT": 0.14,
+        "GB": "37",
+        "HOME": "4-24",
+        "AWAY": "4-25",
+        "DIV": "1-11",
+        "CONF": "5-28",
+        "PPG": 112.8,
+        "OPP PPG": 121.8,
+        "DIFF": -9.0,
+        "STRK": "L6",
+        "L10": "2-8"
+    },
+    "2": {
+        "Team": "Portland Trail Blazers",
+        "W": 15,
+        "L": 41,
+        "PCT": 0.268,
+        "GB": "24.5",
+        "HOME": "9-19",
+        "AWAY": "6-22",
+        "DIV": "1-12",
+        "CONF": "6-32",
+        "PPG": 107.4,
+        "OPP PPG": 116.5,
+        "DIFF": -9.1,
+        "STRK": "L8",
+        "L10": "2-8"
+    }
+}
