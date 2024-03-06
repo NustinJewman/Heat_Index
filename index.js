@@ -1,5 +1,9 @@
 // JSON files have placeholder data - it will be updated each time the script runs
-
+require('dotenv').config();
+const consumerKey = process.env.CONSUMER_KEY;
+const consumerSecret = process.env.CONSUMER_SECRET;
+const tokenKey = process.env.TOKEN_KEY;
+const tokenSecret = process.env.TOKEN_SECRET;
 let wins = require('./json-data/win-streaks.json'); 
 let losses = require('./json-data/losing-streaks.json'); 
 const axios = require('axios'); 
@@ -7,18 +11,15 @@ const fs = require('node:fs'); //file system
 let allStreaks = require('./json-data/all-streaks.json'); 
 const OAuth = require('oauth-1.0a'); 
 const crypto = require('crypto'); 
-// const crypto = import('node:crypto'); 
-// console.log(allStreaks, typeof allStreaks); 
 
 // PLACE all streaks into one json file
   // get all the win streaks in first
     let winStrings = (JSON.stringify(wins)); 
-        // console.log(winStrings, typeof winStrings); 
         fs.writeFile('./json-data/all-streaks.json', winStrings, (err) => {
           if (err) return console.error(err) //else { console.log(streak)}; 
         })
 
-  //get losses, change the keys and 
+  //get losses, change the keys and connect to allStreaks file
     function renameKeys(obj, prefix) {
       let result = {};
       Object.keys(obj).forEach((key, index) => {
@@ -35,14 +36,7 @@ const crypto = require('crypto');
       fs.writeFile('./json-data/all-streaks.json', JSON.stringify(allStreaks), (err) => {
         if (err) console.error(err); 
       });   
-      
-      // let data = {"text": "Initialized..."};  
-      // console.log("Initial Data object: " + data.text, typeof data); 
-      
-      // let today = new Date(); 
-      // console.log(today.toDateString()); 
-      // const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; 
-      
+
       let positiveVerbs = ['maintaining', 'upholding', 'sustaining', 'managing', 'on', 'trying to add to', 'trying to extend', 'currently on', 'pushing', 'hoping to continue building on']; 
       let negativeVerbs = ['suffering', 'going through', 'on', 'trying to break', 'battling', 'currently on', 'dealing with', 'fighting', 'facing', 'hoping to end']; 
 
@@ -84,26 +78,25 @@ const crypto = require('crypto');
       }
 
       function setUpAuthorization() {
-      const oauth = OAuth({ // required for the instance to be created - which provides the nonce
+      const oauth = OAuth({ // required for authorization - also provides the nonce
           consumer: {
-            key: '7do39yoO3XJD7cFDgnw2TbwC4',
-            secret: 'Ea7rsSbyZ936ZfxqiqaG9AcRy9FYKpTpBBZhByeXlPrAxA5VtG'
-            // bearer token: AAAAAAAAAAAAAAAAAAAAACw%2BsAEAAAAA8%2FLW0xKn3kD6P6uqDvSRiUJcD1A%3DIeubXgrhbrmo8EYpC9KWtfjd4mttMvCojowU1uVwyuEnA14eBH
+            key: process.env.CONSUMER_KEY,
+            secret: process.env.CONSUMER_SECRET
           },     
           signature_method: 'HMAC-SHA1',
-          hash_function(base_string, key) {
+          hash_function(base_string, key) { 
             return crypto
             .createHmac('sha1', key)
             .update(base_string)
             .digest('base64');
           },   
-          nonce_length: 11, 
+          nonce_length: 11, // length matches successful requests from Postman
           parameter_seperator: ','
         });  
         
         const token = {
-          key: '1749975350782656512-yUMaJsa6TqPOpKpOHZ6BvyFI11mzC0',
-          secret: 'yJcq9t6ob48fN86wqhQK2qYFbxtqBVYbftzFs0EqYZ62I' // yJcq9t6ob48fN86wqhQK2qYFbxtqBVYbftzFs0EqYZ62I
+          key: process.env.TOKEN_KEY,
+          secret: process.env.TOKEN_SECRET 
         }  
         
         const request = {
@@ -147,16 +140,10 @@ let config = {
   headers: { 
     'Content-Type': 'application/json', 
     'Authorization': ``, 
-    //  'Authorization': 'OAuth oauth_consumer_key="FQQMEpazjknIYGr4K302vGLzK",oauth_token="1749975350782656512-NvWNPOYrLsLHXvW6A9J1uLq7W01cfE",oauth_signature_method="HMAC-SHA1",oauth_timestamp="1709306768",oauth_nonce="GzeF1gG34ki",oauth_version="1.0",oauth_signature="J2zXbh9D9M93VO2yZHIY4GwSKJo%3D"', 
     'Cookie': 'guest_id=v1%3A170647810995146516; guest_id_ads=v1%3A170647810995146516; guest_id_marketing=v1%3A170647810995146516; personalization_id="v1_lNTPkAFdrQyW8qW0etiwCg=="'
   },
-  // data : data
-  // data : {}
 };
-// console.log(config.data, typeof config.data, 'line 31'); 
-    // console.log('Initial CONFIG: ', config, "END"); 
-
-
+// console.log(config.data, typeof config.data);  
 
 let tweets = []; 
 const delay = (ms) => new Promise(res => setTimeout(res, ms)) // delay for the timestamps for the tweets so that they are not all the same****
@@ -190,10 +177,6 @@ async function processTweets(streaksJSON) {
 for (obj in streaksJSON) {
   // console.log(typeof streaksJSON[obj])
     await delay(750); 
-        //     data = JSON.stringify({ //json.stringify needed here in order to make it a string for the axios config 
-        //                             // AND because JSON requires double quotes - if we use backticks here it breaks
-        //   "text": `The ${streaksJSON[obj]["Team"]} (${streaksJSON[obj]["W"]}-${streaksJSON[obj]["L"]}) are ${streaksJSON[obj]["STRK"].substring(0,1) === 'W' ? positiveVerbs[(Math.floor(Math.random() * positiveVerbs.length))] : negativeVerbs[(Math.floor(Math.random() * negativeVerbs.length))]} a ${streaksJSON[obj]["STRK"].substring(1)} game ${streaksJSON[obj]["STRK"].substring(0,1) === 'W' ? 'winning' : 'losing'} streak. Timestamp: ${new Date().toTimeString().split(' ')[0].concat(`:${new Date().getMilliseconds()}`)}`
-        // })
             config.data = JSON.stringify({ //json.stringify needed here in order to make it a string for the axios config 
                                     // AND because JSON requires double quotes - if we use backticks here it breaks
           "text": `The ${streaksJSON[obj]["Team"]} (${streaksJSON[obj]["W"]}-${streaksJSON[obj]["L"]}) are ${streaksJSON[obj]["STRK"].substring(0,1) === 'W' ? positiveVerbs[(Math.floor(Math.random() * positiveVerbs.length))] : negativeVerbs[(Math.floor(Math.random() * negativeVerbs.length))]} a ${streaksJSON[obj]["STRK"].substring(1)} game ${streaksJSON[obj]["STRK"].substring(0,1) === 'W' ? 'winning' : 'losing'} streak. Timestamp: ${new Date().toTimeString().split(' ')[0].concat(`:${new Date().getMilliseconds()}`)}`
@@ -206,14 +189,10 @@ for (obj in streaksJSON) {
 
   for (let i = 0; i < tweets.length; i++) {
     await delay(1500); 
-    // config.headers = reorderAuthorizationHeader(config.headers); 
     // console.log(config.headers.Authorization); 
     config.data = tweets[i]; // object
     config.headers["Authorization"] = setUpAuthorization()["Authorization"]; 
     console.log(`TWEET ${i + 1} config`, config, `TWEET ${i + 1} config end`); 
-    // console.log(data, typeof data, 'line 70'); 
-    // console.log('166 FINAL CONFIG:', config); 
-    // console.log(config.headers); 
     makeAxiosRequest(); // COMMENTED OUT to prevent over requesting to the Twitter API - uncomment to submit the tweet requests
   }
 
