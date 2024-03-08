@@ -36,7 +36,8 @@ def edit_column_in_df(df, column_name):
     # Apply the function to the specified column
     df[column_name] = df[column_name].apply(edit_first_word)
 
-url = 'https://www.espn.com/nba/standings'
+url = 'https://www.espn.com/nba/standings' # this page does not appear to change over time, so we can reasonably expect the data
+                                            # pulled to remain consistent
 
 tables = pd.read_html(url, header=None)
 
