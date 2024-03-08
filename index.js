@@ -13,7 +13,7 @@ const OAuth = require('oauth-1.0a');
 const crypto = require('crypto'); 
 
 // PLACE all streaks into one json file
-  // get all the win streaks in first
+  // get all the win streaks into allstreaks file first
     let winStrings = (JSON.stringify(wins)); 
         fs.writeFile('./json-data/all-streaks.json', winStrings, (err) => {
           if (err) return console.error(err) //else { console.log(streak)}; 
@@ -31,11 +31,20 @@ const crypto = require('crypto');
     // console.log(losses); 
     // put them into all streaks
       allStreaks = Object.assign(allStreaks, wins);
-      allStreaks = Object.assign(allStreaks, losses);  
+      allStreaks = Object.assign(allStreaks, losses);  // if losses is empty, will this work?
       // console.log(allStreaks, typeof allStreaks); 
       fs.writeFile('./json-data/all-streaks.json', JSON.stringify(allStreaks), (err) => {
         if (err) console.error(err); 
-      });   
+      });  
+      
+      function resetAllStreaksJSON() {
+        fs.writeFile('./json-data/all-streaks.json', '', (err) => {
+          if (err) return console.error(err) //else { console.log(streak)}; 
+        })
+        fs.appendFile('./json-data/all-streaks.json', '{}', (err) => {
+          if (err) return console.error(err) //else { console.log(streak)}; 
+        })
+      }
 
       let positiveVerbs = ['maintaining', 'upholding', 'sustaining', 'managing', 'on', 'trying to add to', 'trying to extend', 'currently on', 'pushing', 'hoping to continue building on']; 
       let negativeVerbs = ['suffering', 'going through', 'on', 'trying to break', 'battling', 'currently on', 'dealing with', 'fighting', 'facing', 'hoping to end']; 
@@ -161,19 +170,10 @@ function makeAxiosRequest() { // async function?
   // console.log(config.data); 
 }
 
-// function reorderAuthorizationHeader(headers) {
-//   const authHeader = headers['Authorization'];
-//   const authParams = authHeader.split(',').map(param => param.trim());
-//   const sortedParams = authParams.sort(); // Sort alphabetically
-//   const reorderedAuthHeader = sortedParams.join(',');
-  
-//   headers['Authorization'] = reorderedAuthHeader;
-//   return headers;
-// }
-
-
-
 async function processTweets(streaksJSON) {
+  if (1) {
+
+  }
 for (obj in streaksJSON) {
   // console.log(typeof streaksJSON[obj])
     await delay(750); 
@@ -182,7 +182,7 @@ for (obj in streaksJSON) {
           "text": `The ${streaksJSON[obj]["Team"]} (${streaksJSON[obj]["W"]}-${streaksJSON[obj]["L"]}) are ${streaksJSON[obj]["STRK"].substring(0,1) === 'W' ? positiveVerbs[(Math.floor(Math.random() * positiveVerbs.length))] : negativeVerbs[(Math.floor(Math.random() * negativeVerbs.length))]} a ${streaksJSON[obj]["STRK"].substring(1)} game ${streaksJSON[obj]["STRK"].substring(0,1) === 'W' ? 'winning' : 'losing'} streak. Timestamp: ${new Date().toTimeString().split(' ')[0].concat(`:${new Date().getMilliseconds()}`)}`
         })
   // console.log("Data in FOR LOOP line 46: " + data, typeof data); // data is a string here
-  console.log(config.data, typeof config, typeof config.data); 
+  console.log(config.data); 
     tweets.push(JSON.parse(config.data)); 
         // console.log(tweets); 
   }
@@ -193,11 +193,12 @@ for (obj in streaksJSON) {
     config.data = tweets[i]; // object
     config.headers["Authorization"] = setUpAuthorization()["Authorization"]; 
     console.log(`TWEET ${i + 1} config`, config, `TWEET ${i + 1} config end`); 
-    makeAxiosRequest(); // COMMENTED OUT to prevent over requesting to the Twitter API - uncomment to submit the tweet requests
+    // makeAxiosRequest(); // COMMENTED OUT to prevent over requesting to the Twitter API - uncomment to submit the tweet requests
   }
 
 // })
 tweets = []; 
+resetAllStreaksJSON(); 
 }
 
-processTweets(allStreaks); 
+processTweets(allStreaks); //asynchronous
