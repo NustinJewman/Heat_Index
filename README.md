@@ -3,3 +3,4 @@ This is a Twitter bot that regularly send updates about the current win streaks 
 - NodeJS and Axios requests to the Twitter API
 - Utilizing the fs module to write and read JSON
 - OAuth1.0a Authorization and Authentication
+- JavaScript Promises
