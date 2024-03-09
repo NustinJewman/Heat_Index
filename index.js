@@ -6,16 +6,17 @@ const tokenKey = process.env.TOKEN_KEY;
 const tokenSecret = process.env.TOKEN_SECRET;
 let wins = require('./json-data/win-streaks.json'); 
 let losses = require('./json-data/losing-streaks.json'); 
+let lastStreaks = require('./json-data/last-streaks.json'); 
+let allStreaks = require('./json-data/all-streaks.json'); 
 const axios = require('axios'); 
 const fs = require('node:fs'); //file system
-let allStreaks = require('./json-data/all-streaks.json'); 
 const OAuth = require('oauth-1.0a'); 
 const crypto = require('crypto'); 
 
 // PLACE all streaks into one json file
   // get all the win streaks into allstreaks file first
     let winStrings = (JSON.stringify(wins)); 
-        fs.writeFile('./json-data/all-streaks.json', winStrings, (err) => {
+        fs.writeFileSync('./json-data/all-streaks.json', winStrings, (err) => {
           if (err) return console.error(err) //else { console.log(streak)}; 
         })
 
@@ -28,20 +29,28 @@ const crypto = require('crypto');
       return result;
     }
     losses = renameKeys(losses, 'A'); 
-    // console.log(losses); 
     // put them into all streaks
       allStreaks = Object.assign(allStreaks, wins);
-      allStreaks = Object.assign(allStreaks, losses);  // if losses is empty, will this work?
+      allStreaks = Object.assign({}, allStreaks, losses);  // if losses is empty, will this work?
       // console.log(allStreaks, typeof allStreaks); 
-      fs.writeFile('./json-data/all-streaks.json', JSON.stringify(allStreaks), (err) => {
+      fs.writeFileSync('./json-data/all-streaks.json', JSON.stringify(allStreaks), (err) => {
         if (err) console.error(err); 
       });  
+
+      // write a copy of the data to a copy file so that we can compare and see if any changes
+      fs.writeFileSync('./json-data/last-streaks.json', '', (err) => {
+        if (err) console.error(err); 
+      });
+      fs.writeFileSync('./json-data/last-streaks.json', JSON.stringify(allStreaks), (err) => {
+        if (err) console.error(err); 
+      });
+      // if no changes, run a tweet from data from the API
       
       function resetAllStreaksJSON() {
-        fs.writeFile('./json-data/all-streaks.json', '', (err) => {
+        fs.writeFileSync('./json-data/all-streaks.json', '', (err) => {
           if (err) return console.error(err) //else { console.log(streak)}; 
-        })
-        fs.appendFile('./json-data/all-streaks.json', '{}', (err) => {
+        });
+        fs.appendFileSync('./json-data/all-streaks.json', '{}', (err) => {
           if (err) return console.error(err) //else { console.log(streak)}; 
         })
       }
@@ -170,16 +179,38 @@ function makeAxiosRequest() { // async function?
   // console.log(config.data); 
 }
 
-async function processTweets(streaksJSON) {
-  if (1) {
-
+function removeDuplicateStreaks(streaksJSONObj) { // comparing JSONObject to the last streaks object
+  let holderArray = []; 
+  // loop each object from all streaks
+  for (object in streaksJSONObj) { // allstreaks
+    holderArray.push(streaksJSONObj[object]); 
+    // loop through last streaks
+    for (item in lastStreaks) {
+      if (JSON.stringify(streaksJSONObj[object]) == JSON.stringify(lastStreaks[item])) {
+        console.log('Duplicate tweet found: ', streaksJSONObj[object]); 
+        // remove that object from all streaks
+        delete streaksJSONObj[object]; 
+        // 
+      }
+    }
+    
   }
+  holderArray.forEach(obj => {
+    lastStreaks = Object.assign(lastStreaks, obj); 
+  });
+  console.log('NEW LASTSTEAKS:', lastStreaks); 
+}
+
+async function processTweets(streaksJSON) {
+// modify all streaks to remove duplicates
+removeDuplicateStreaks(allStreaks); 
 for (obj in streaksJSON) {
   // console.log(typeof streaksJSON[obj])
     await delay(750); 
             config.data = JSON.stringify({ //json.stringify needed here in order to make it a string for the axios config 
                                     // AND because JSON requires double quotes - if we use backticks here it breaks
-          "text": `The ${streaksJSON[obj]["Team"]} (${streaksJSON[obj]["W"]}-${streaksJSON[obj]["L"]}) are ${streaksJSON[obj]["STRK"].substring(0,1) === 'W' ? positiveVerbs[(Math.floor(Math.random() * positiveVerbs.length))] : negativeVerbs[(Math.floor(Math.random() * negativeVerbs.length))]} a ${streaksJSON[obj]["STRK"].substring(1)} game ${streaksJSON[obj]["STRK"].substring(0,1) === 'W' ? 'winning' : 'losing'} streak. Timestamp: ${new Date().toTimeString().split(' ')[0].concat(`:${new Date().getMilliseconds()}`)}`
+          // "text": `The ${streaksJSON[obj]["Team"]} (${streaksJSON[obj]["W"]}-${streaksJSON[obj]["L"]}) are ${streaksJSON[obj]["STRK"].substring(0,1) === 'W' ? positiveVerbs[(Math.floor(Math.random() * positiveVerbs.length))] : negativeVerbs[(Math.floor(Math.random() * negativeVerbs.length))]} a ${streaksJSON[obj]["STRK"].substring(1)} game ${streaksJSON[obj]["STRK"].substring(0,1) === 'W' ? 'winning' : 'losing'} streak. Timestamp: ${new Date().toTimeString().split(' ')[0].concat(`:${new Date().getMilliseconds()}`)}`
+          "text": `The ${streaksJSON[obj]["Team"]} (${streaksJSON[obj]["W"]}-${streaksJSON[obj]["L"]}) are ${streaksJSON[obj]["STRK"].substring(0,1) === 'W' ? positiveVerbs[(Math.floor(Math.random() * positiveVerbs.length))] : negativeVerbs[(Math.floor(Math.random() * negativeVerbs.length))]} a ${streaksJSON[obj]["STRK"].substring(1)} game ${streaksJSON[obj]["STRK"].substring(0,1) === 'W' ? 'winning' : 'losing'} streak.` // The timestamp ios not necessary for posting
         })
   // console.log("Data in FOR LOOP line 46: " + data, typeof data); // data is a string here
   console.log(config.data); 
@@ -187,16 +218,30 @@ for (obj in streaksJSON) {
         // console.log(tweets); 
   }
 
+  // if there are absiolutely no changes in streaks
+  //   if ((JSON.stringify(lastStreaks) == JSON.stringify(allStreaks))) {
+  //   tweets = []; 
+  //   resetAllStreaksJSON();
+  //   console.log('No new streaks today. Tweets cancelled.'); 
+  //   return 'No new streaks today.'
+  // }
+
   for (let i = 0; i < tweets.length; i++) {
     await delay(1500); 
     // console.log(config.headers.Authorization); 
     config.data = tweets[i]; // object
     config.headers["Authorization"] = setUpAuthorization()["Authorization"]; 
     console.log(`TWEET ${i + 1} config`, config, `TWEET ${i + 1} config end`); 
-    // makeAxiosRequest(); // COMMENTED OUT to prevent over requesting to the Twitter API - uncomment to submit the tweet requests
+    makeAxiosRequest(); // COMMENTED OUT to prevent over requesting to the Twitter API - uncomment to submit the tweet requests
   }
 
 // })
+if (!tweets[0]) {
+  console.log('No new streaks/tweets today.'); 
+} else {
+  console.log(tweets); 
+}
+// console.log('TWEETS', tweets); 
 tweets = []; 
 resetAllStreaksJSON(); 
 }
